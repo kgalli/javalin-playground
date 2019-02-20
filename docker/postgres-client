@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker run --rm -it --network=host -e PGPASSWORD=kgalli postgres psql -h localhost -p 9999 -U kgalli
