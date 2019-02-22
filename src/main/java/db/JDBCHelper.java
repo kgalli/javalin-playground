@@ -37,7 +37,7 @@ public class JDBCHelper {
         }
     }
 
-    private static Connection getConnection() throws SQLException {
+    public static final Connection getConnection() throws SQLException {
         //URI dbUri = new URI(System.getenv("DATABASE_URL"));
         var dbUrl = "jdbc:postgresql://localhost:9999/kgalli?user=kgalli&password=kgalli";
         var username = "kgalli";

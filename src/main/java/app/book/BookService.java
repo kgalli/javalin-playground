@@ -1,11 +1,15 @@
 package app.book;
 
 import db.JDBCHelper;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.*;
+
+import static de.kgalli.javalin_example.tables.Books.*;
 
 public class BookService {
 
@@ -16,7 +20,7 @@ public class BookService {
     }
 
     public Iterable<Book> getAllBooks() {
-        return books;
+        return getBooksViaJooq();
     }
 
     public Optional<Book> getBookByIsbn(String isbn) {
@@ -51,4 +55,22 @@ public class BookService {
 
         return books;
     }
+
+    private List<Book> getBooksViaJooq() {
+        try (var conn = JDBCHelper.getConnection()) {
+            DSLContext create = DSL.using(conn, SQLDialect.POSTGRES);
+
+            List<Book> books = create.select().from(BOOKS).fetchInto(Book.class);
+
+            return books;
+        }
+
+        // For the sake of this tutorial, let's keep exception handling simple
+        catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+
+    }
+
 }
