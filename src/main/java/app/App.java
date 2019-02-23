@@ -8,21 +8,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class App {
 
     private static Logger logger = LoggerFactory.getLogger(App.class);
     private Javalin app;
 
-    public App(Integer port, EndpointGroup feature) {
+    public App(Integer port, List<EndpointGroup> routes) {
         this.app = Javalin.create()
                 .port(port)
                 .enableRouteOverview("/routes")
                 .requestLogger(getCustomRequestLogger());
 
-        app.routes(feature);
+        app.routes(addEndpoints(routes));
         app.exception(Exception.class, handleInternalServerError());
-        app.error(404, ctx -> { ctx.json(new HashMap<>()); });
+        app.error(404, ctx -> ctx.json(new HashMap<>()));
     }
 
     public void run() {
@@ -39,6 +40,10 @@ public class App {
         }
 
         app.stop();
+    }
+
+    private EndpointGroup addEndpoints(List<EndpointGroup> routes) {
+        return () -> routes.forEach((route) -> route.addEndpoints());
     }
 
     private ExceptionHandler handleInternalServerError() {

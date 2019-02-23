@@ -5,13 +5,13 @@ import app.utils.Path;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.*;
 
-import javax.print.attribute.URISyntax;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CompletionException;
 
@@ -25,7 +25,7 @@ public class BooksIntegrationTest {
 
     @BeforeAll
     public static void setup() {
-        app = new App(3099, BooksRoutes.booksRoutes());
+        app = new App(3099, Arrays.asList(BooksRoutes.booksRoutes()));
         app.run();
     }
 

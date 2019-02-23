@@ -2,6 +2,8 @@ import app.App;
 import app.books.BooksRoutes;
 import db.DBUtils;
 
+import java.util.Arrays;
+
 import static config.ApplicationProperties.*;
 
 public class Main {
@@ -11,7 +13,7 @@ public class Main {
         setSystemPropertiesViaConfigFile();
         DBUtils.migrate();
 
-        var app = new App(3000, BooksRoutes.booksRoutes());
+        var app = new App(3000, Arrays.asList(BooksRoutes.booksRoutes()));
         app.run();
     }
 
