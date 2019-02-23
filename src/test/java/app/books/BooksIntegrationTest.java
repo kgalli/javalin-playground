@@ -3,6 +3,8 @@ package app.books;
 import app.App;
 import app.utils.Path;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import config.AppConfig;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -12,20 +14,26 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 @DisplayName("Books Integration Test")
 public class BooksIntegrationTest {
 
+    private static final int APP_PORT = 3099;
     private static App app;
 
     @BeforeAll
     public static void setup() {
-        app = new App(3099, Arrays.asList(BooksRoutes.booksRoutes()));
+        var appConfig = new AppConfig();
+        appConfig.setAppPort(APP_PORT);
+
+        app = new App(appConfig, Arrays.asList(BooksRoutes.add()));
         app.run();
     }
 
@@ -38,21 +46,20 @@ public class BooksIntegrationTest {
     @Nested
     class PostBook {
 
-
         @Test
+        @Disabled
         @DisplayName("should create book if input is valid")
         public void createBookWithValidInput() {
-            assertEquals(true, true);
+            assertThat(true, is(true));
         }
-
 
         @Test
+        @Disabled
         @DisplayName("should fail validation if input is invalid")
         public void createBookWithInvalidInput() {
-            assertEquals(true, true);
+            assertThat(true, is(true));
 
         }
-
     }
 
     @DisplayName("GET books")
@@ -61,13 +68,17 @@ public class BooksIntegrationTest {
 
         @Test
         @DisplayName("should fetch all books")
-        public void fetchAllBooks() throws URISyntaxException, IOException, InterruptedException {
+        public void fetchAllBooks() {
             var response = getRequest(Path.Api.BOOKS);
             var statusCode = response.statusCode();
-            var body = responseToHashMap(response.body());
+            var body = responseToHashMapList(response.body());
 
-            assertEquals(200, statusCode);
-            assertEquals(body, body.isEmpty());
+            // TODO create some books and set list below accordingly
+            var expectedBookList = Collections.EMPTY_LIST;
+
+            assertThat(statusCode, is(200));
+            assertThat(body, is(equalTo(expectedBookList)));
+
         }
     }
 
@@ -89,18 +100,30 @@ public class BooksIntegrationTest {
     }
 
     private Map<String, String> responseToHashMap(String response) {
-        UncheckedObjectMapper objectMapper = new UncheckedObjectMapper();
+        var objectMapper = new UncheckedObjectMapper();
 
         return objectMapper.readValue(response);
     }
 
-    class UncheckedObjectMapper extends com.fasterxml.jackson.databind.ObjectMapper {
-        /**
-         * Parses the given JSON string into a Map.
-         */
-        Map<String, String> readValue(String content) {
+    private List<Map<String, String>> responseToHashMapList(String response) {
+        var objectMapper = new UncheckedObjectMapper();
+
+        return objectMapper.readValues(response);
+    }
+
+    class UncheckedObjectMapper extends ObjectMapper {
+        public Map<String, String> readValue(String content) {
             try {
                 return this.readValue(content, new TypeReference<>() {
+                });
+            } catch (IOException ioe) {
+                throw new CompletionException(ioe);
+            }
+        }
+
+        public List<Map<String, String>> readValues(String content) {
+            try {
+                return this.readValue(content, new TypeReference<List>() {
                 });
             } catch (IOException ioe) {
                 throw new CompletionException(ioe);

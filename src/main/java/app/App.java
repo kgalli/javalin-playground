@@ -1,5 +1,6 @@
 package app;
 
+import config.AppConfig;
 import io.javalin.ExceptionHandler;
 import io.javalin.Javalin;
 import io.javalin.RequestLogger;
@@ -14,16 +15,22 @@ public class App {
 
     private static Logger logger = LoggerFactory.getLogger(App.class);
     private Javalin app;
+    private AppConfig config;
 
-    public App(Integer port, List<EndpointGroup> routes) {
+    public App(AppConfig config, List<EndpointGroup> routes) {
+        this.config = config;
         this.app = Javalin.create()
-                .port(port)
+                .port(config.getAppPort())
                 .enableRouteOverview("/routes")
                 .requestLogger(getCustomRequestLogger());
 
         app.routes(addEndpoints(routes));
         app.exception(Exception.class, handleInternalServerError());
         app.error(404, ctx -> ctx.json(new HashMap<>()));
+    }
+
+    public AppConfig getAppConfig() {
+        return this.config;
     }
 
     public void run() {

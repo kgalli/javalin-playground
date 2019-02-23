@@ -2,25 +2,24 @@ package db;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import config.DbConfig;
 import org.flywaydb.core.Flyway;
 
 import java.sql.*;
 
-import static config.ApplicationProperties.*;
 
 public class DBUtils {
 
     private static HikariDataSource dataSource = null;
+    private static DbConfig dbConfig = null;
 
     public static final Connection getConnection() throws SQLException {
         if (dataSource == null) {
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl(getDBUrl());
-            config.setUsername(getDBUser());
-            config.setPassword(getDBPassword());
-            dataSource = new HikariDataSource(config);
-
-            return dataSource.getConnection();
+            HikariConfig hikariConfig = new HikariConfig();
+            hikariConfig.setJdbcUrl(getDbConfig().getUrl());
+            hikariConfig.setUsername(getDbConfig().getUser());
+            hikariConfig.setPassword(getDbConfig().getPassword());
+            dataSource = new HikariDataSource(hikariConfig);
         }
 
         return dataSource.getConnection();
@@ -29,21 +28,17 @@ public class DBUtils {
     public static void migrate() {
         Flyway flyway = Flyway
                 .configure()
-                .dataSource(getDBUrl(), getDBUser(), getDBPassword())
+                .dataSource(getDbConfig().getUrl(), getDbConfig().getUser(), getDbConfig().getPassword())
                 .load();
 
         flyway.migrate();
     }
 
-    private static String getDBUrl() {
-        return System.getProperties().getProperty(DB_URL.displayName());
-    }
+    private static DbConfig getDbConfig() {
+        if (dbConfig ==  null) {
+            dbConfig = new DbConfig();
+        }
 
-    private static String getDBUser() {
-        return System.getProperties().getProperty(DB_USERNAME.displayName());
-    }
-
-    private static String getDBPassword() {
-        return System.getProperties().getProperty(DB_PASSWORD.displayName());
+        return dbConfig;
     }
 }

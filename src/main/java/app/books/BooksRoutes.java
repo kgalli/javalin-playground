@@ -7,8 +7,8 @@ import static io.javalin.apibuilder.ApiBuilder.get;
 
 public class BooksRoutes {
 
-    public static EndpointGroup booksRoutes() {
-        var booksController = initializeDependencies();
+    public static EndpointGroup add() {
+        var booksController = getControllerWithInitializedDependencies();
 
         return () -> {
             get(Path.Api.BOOKS, booksController.fetchAllBooks);
@@ -16,7 +16,7 @@ public class BooksRoutes {
         };
     }
 
-    private static BooksController initializeDependencies() {
+    private static BooksController getControllerWithInitializedDependencies() {
         var bookRepository = new BooksRepository();
         var booksService = new BooksService(bookRepository);
 
