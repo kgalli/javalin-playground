@@ -1,8 +1,9 @@
 package app;
 
-import app.book.BookController;
-import app.book.BookService;
-import app.util.Path;
+import app.books.BooksController;
+import app.books.BooksRepository;
+import app.books.BooksService;
+import app.utils.Path;
 import db.DBUtils;
 import io.javalin.Javalin;
 import io.javalin.RequestLogger;
@@ -17,7 +18,7 @@ import static config.ApplicationProperties.*;
 public class Main {
 
     public static Logger logger;
-    public static BookService bookService;
+    public static BooksService booksService;
 
     public static void main(String[] args) {
 
@@ -28,15 +29,19 @@ public class Main {
         var app = startApp();
 
         app.routes(() -> {
-            get(Path.Api.BOOKS, BookController.fetchAllBooks);
-            get(Path.Api.ONE_BOOK, BookController.fetchOneBook);
+            get(Path.Api.BOOKS, BooksController.fetchAllBooks);
+            get(Path.Api.ONE_BOOK, BooksController.fetchOneBook);
         });
 
         app.error(404, ctx -> { ctx.json(new HashMap<>()); });
     }
 
     private static void initializeDependencies() {
-        bookService = new BookService();
+
+        // books feature
+        var bookRepository = new BooksRepository();
+        booksService = new BooksService(bookRepository);
+
         logger = LoggerFactory.getLogger(Main.class);
     }
 

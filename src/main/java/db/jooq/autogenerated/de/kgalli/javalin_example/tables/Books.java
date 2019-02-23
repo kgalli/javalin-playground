@@ -4,18 +4,25 @@
 package de.kgalli.javalin_example.tables;
 
 
+import de.kgalli.javalin_example.Indexes;
+import de.kgalli.javalin_example.Keys;
 import de.kgalli.javalin_example.Public;
 import de.kgalli.javalin_example.tables.records.BooksRecord;
+
+import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
 
@@ -33,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Books extends TableImpl<BooksRecord> {
 
-    private static final long serialVersionUID = 1728599235;
+    private static final long serialVersionUID = -375583356;
 
     /**
      * The reference instance of <code>public.books</code>
@@ -61,7 +68,7 @@ public class Books extends TableImpl<BooksRecord> {
     /**
      * The column <code>public.books.isbn</code>.
      */
-    public final TableField<BooksRecord, String> ISBN = createField("isbn", org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<BooksRecord, String> ISBN = createField("isbn", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
      * Create a <code>public.books</code> table reference
@@ -102,6 +109,30 @@ public class Books extends TableImpl<BooksRecord> {
     @Override
     public Schema getSchema() {
         return Public.PUBLIC;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.BOOKS_PKEY);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UniqueKey<BooksRecord> getPrimaryKey() {
+        return Keys.BOOKS_PKEY;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UniqueKey<BooksRecord>> getKeys() {
+        return Arrays.<UniqueKey<BooksRecord>>asList(Keys.BOOKS_PKEY);
     }
 
     /**

@@ -1,4 +1,4 @@
-package app.book;
+package app.books;
 
 
 public class Book {

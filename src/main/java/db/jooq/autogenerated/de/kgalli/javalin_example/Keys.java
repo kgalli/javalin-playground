@@ -4,7 +4,9 @@
 package de.kgalli.javalin_example;
 
 
+import de.kgalli.javalin_example.tables.Books;
 import de.kgalli.javalin_example.tables.FlywaySchemaHistory;
+import de.kgalli.javalin_example.tables.records.BooksRecord;
 import de.kgalli.javalin_example.tables.records.FlywaySchemaHistoryRecord;
 
 import javax.annotation.Generated;
@@ -36,6 +38,7 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<BooksRecord> BOOKS_PKEY = UniqueKeys0.BOOKS_PKEY;
     public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = UniqueKeys0.FLYWAY_SCHEMA_HISTORY_PK;
 
     // -------------------------------------------------------------------------
@@ -48,6 +51,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     private static class UniqueKeys0 {
+        public static final UniqueKey<BooksRecord> BOOKS_PKEY = Internal.createUniqueKey(Books.BOOKS, "books_pkey", Books.BOOKS.ISBN);
         public static final UniqueKey<FlywaySchemaHistoryRecord> FLYWAY_SCHEMA_HISTORY_PK = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, "flyway_schema_history_pk", FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK);
     }
 }
