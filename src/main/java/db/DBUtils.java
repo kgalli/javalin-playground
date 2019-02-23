@@ -1,8 +1,8 @@
 package db;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.flywaydb.core.Flyway;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 
@@ -10,10 +10,20 @@ import static config.ApplicationProperties.*;
 
 public class DBUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(DBUtils.class);
+    private static HikariDataSource dataSource = null;
 
     public static final Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(getDBUrl(), getDBUser(), getDBPassword());
+        if (dataSource == null) {
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl(getDBUrl());
+            config.setUsername(getDBUser());
+            config.setPassword(getDBPassword());
+            dataSource = new HikariDataSource(config);
+
+            return dataSource.getConnection();
+        }
+
+        return dataSource.getConnection();
     }
 
     public static void migrate() {
