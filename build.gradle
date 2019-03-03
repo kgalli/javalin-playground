@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'kgalli.de'
-version '1.0-SNAPSHOT'
+version '1.0.0'
 
 sourceCompatibility = 1.11
 
@@ -31,6 +31,17 @@ dependencies {
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.4.0'
     testCompile group: 'org.hamcrest', name: 'hamcrest', version: '2.1'
     testCompile group: 'com.h2database', name: 'h2', version: '1.4.198'
+}
+
+jar {
+    from {
+        (configurations.runtime).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    manifest {
+        attributes("Main-Class": "Main" )
+    }
 }
 
 test {
