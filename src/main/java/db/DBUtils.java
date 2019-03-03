@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import config.DbConfig;
 import org.flywaydb.core.Flyway;
 
+import javax.sql.DataSource;
 import java.sql.*;
 
 
@@ -14,24 +15,20 @@ public class DBUtils {
     private static DbConfig dbConfig = null;
 
     public static final Connection getConnection() throws SQLException {
-        if (dataSource == null) {
-            HikariConfig hikariConfig = new HikariConfig();
-            hikariConfig.setJdbcUrl(getDbConfig().getUrl());
-            hikariConfig.setUsername(getDbConfig().getUser());
-            hikariConfig.setPassword(getDbConfig().getPassword());
-            dataSource = new HikariDataSource(hikariConfig);
-        }
-
-        return dataSource.getConnection();
+        return getDataSource().getConnection();
     }
 
     public static void migrate() {
         Flyway flyway = Flyway
                 .configure()
-                .dataSource(getDbConfig().getUrl(), getDbConfig().getUser(), getDbConfig().getPassword())
+                .dataSource(getDataSource())
                 .load();
 
         flyway.migrate();
+    }
+
+    public static void setDbConfig(DbConfig config) {
+        dbConfig = config;
     }
 
     private static DbConfig getDbConfig() {
@@ -40,5 +37,17 @@ public class DBUtils {
         }
 
         return dbConfig;
+    }
+
+    private static DataSource getDataSource() {
+        if (dataSource == null) {
+            HikariConfig hikariConfig = new HikariConfig();
+            hikariConfig.setJdbcUrl(getDbConfig().getUrl());
+            hikariConfig.setUsername(getDbConfig().getUser());
+            hikariConfig.setPassword(getDbConfig().getPassword());
+            dataSource = new HikariDataSource(hikariConfig);
+        }
+
+        return dataSource;
     }
 }

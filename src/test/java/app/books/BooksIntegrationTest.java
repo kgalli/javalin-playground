@@ -5,6 +5,8 @@ import app.utils.Path;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import config.AppConfig;
+import config.DbConfig;
+import db.DBUtils;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -32,6 +34,15 @@ public class BooksIntegrationTest {
     public static void setup() {
         var appConfig = new AppConfig();
         appConfig.setAppPort(APP_PORT);
+
+        var dbConfig = new DbConfig();
+        dbConfig.setPassword("password");
+        dbConfig.setUser("sa");
+        // dataSource.setUrl("jdbc:h2:mem:test;MODE=Mysql;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;INIT=CREATE SCHEMA IF NOT EXISTS MYAPP");
+        dbConfig.setDbUrl("jdbc:h2:mem:test_mem;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;CASE_INSENSITIVE_IDENTIFIERS=true");
+
+        DBUtils.setDbConfig(dbConfig);
+        DBUtils.migrate();
 
         app = new App(appConfig, Arrays.asList(BooksRoutes.add()));
         app.run();
