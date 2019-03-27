@@ -1,13 +1,11 @@
 package app.books;
 
-import app.App;
-import app.utils.Path;
+import common.BaseIntegrationTest;
+import de.kgalli.bookstore.utils.Path;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import config.AppConfig;
-import config.DbConfig;
-import db.DBUtils;
 import org.junit.jupiter.api.*;
+
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,7 +13,6 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,33 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @DisplayName("Books Integration Test")
-public class BooksIntegrationTest {
-
-    private static final int APP_PORT = 3099;
-    private static App app;
-
-    @BeforeAll
-    public static void setup() {
-        var appConfig = new AppConfig();
-        appConfig.setAppPort(APP_PORT);
-
-        var dbConfig = new DbConfig();
-        dbConfig.setPassword("password");
-        dbConfig.setUser("sa");
-        // dataSource.setUrl("jdbc:h2:mem:test;MODE=Mysql;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;INIT=CREATE SCHEMA IF NOT EXISTS MYAPP");
-        dbConfig.setDbUrl("jdbc:h2:mem:test_mem;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;CASE_INSENSITIVE_IDENTIFIERS=true");
-
-        DBUtils.setDbConfig(dbConfig);
-        DBUtils.migrate();
-
-        app = new App(appConfig, Arrays.asList(BooksRoutes.add()));
-        app.run();
-    }
-
-    @AfterAll
-    public static void tearDown() {
-        app.stop();
-    }
+public class BooksIntegrationTest extends BaseIntegrationTest {
 
     @DisplayName("POST book")
     @Nested
@@ -73,18 +44,18 @@ public class BooksIntegrationTest {
         }
     }
 
-    @DisplayName("GET books")
+    @DisplayName("GET book")
     @Nested
     class GetBooks {
 
         @Test
-        @DisplayName("should fetch all books")
+        @DisplayName("should fetch all book")
         public void fetchAllBooks() {
             var response = getRequest(Path.Api.BOOKS);
             var statusCode = response.statusCode();
             var body = responseToHashMapList(response.body());
 
-            // TODO create some books and set list below accordingly
+            // TODO create some book and set list below accordingly
             var expectedBookList = Collections.EMPTY_LIST;
 
             assertThat(statusCode, is(200));
@@ -98,7 +69,7 @@ public class BooksIntegrationTest {
             HttpClient client = HttpClient.newHttpClient();
             HttpResponse<String> response = client.send(
                     HttpRequest
-                            .newBuilder(new URI("http://localhost:3099" + path))
+                            .newBuilder(new URI("http://localhost:" + APP_PORT + path))
                                     .header("Content-Type", "application/json")
                                     .GET()
                                     .build(), HttpResponse.BodyHandlers.ofString()

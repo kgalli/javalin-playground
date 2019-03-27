@@ -1,17 +1,17 @@
-import app.App;
-import app.books.BooksRoutes;
-import config.AppConfig;
-import db.DBUtils;
-
-import java.util.Arrays;
+import de.kgalli.AppModule;
+import de.kgalli.bookstore.App;
+import com.google.inject.Guice;
+import de.kgalli.common.ConnectionFactory;
+import de.kgalli.bookstore.utils.FlywayUtils;
 
 public class Main {
 
     public static void main(String[] args) {
-        var appConfig = new AppConfig();
-        var app = new App(new AppConfig(), Arrays.asList(BooksRoutes.add()));
+        System.setProperty("org.jooq.no-logo", "true");
+        ConnectionFactory.connect();
+        FlywayUtils.migrate();
 
-        DBUtils.migrate();
-        app.run();
+        var injector = Guice.createInjector(AppModule.create());
+        injector.getInstance(App.class).boot(args);
     }
 }
