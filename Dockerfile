@@ -7,8 +7,9 @@ RUN mkdir -p $WORKING_DIRECTORY
 
 WORKDIR $WORKING_DIRECTORY
 
+COPY settings.gradle .
 COPY build.gradle .
-COPY src .
+COPY src src
 
 RUN gradle assemble
 
@@ -20,6 +21,6 @@ ENV WORKING_DIRECTORY /usr/src/app
 
 WORKDIR $WORKING_DIRECTORY
 
-COPY --from=builder /home/gradle/app/build/libs/app-1.0.0.jar app.jar
+COPY --from=builder /home/gradle/app/build/libs/javalin-playground-1.0.0.jar app.jar
 
 CMD [ "java", "-jar", "app.jar"]
